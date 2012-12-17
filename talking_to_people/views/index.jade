@@ -3,5 +3,7 @@ extends layout
 block content
   div Hello, dnode server!
   a#click_me(href="#") Click me to execute something on the server!
+  div And see the results here:
   div#text_area
+  script(src='/javascripts/jquery.min.js')
   script(src='/javascripts/bundle.js')
