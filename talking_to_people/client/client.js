@@ -6,9 +6,6 @@ var events = require('events'),
 
 function Client() {
   this.eventListeners = [];
-  this.funcPointers = [];
-  this.currentState = null;
-  this.ready = false;
   events.EventEmitter.call(this);
 }
 
@@ -19,15 +16,6 @@ Client.prototype.clearEventListeners = function () {
   this.eventListeners.forEach(function (listener) {
     self.removeListener(listener.event, listener.fn);
   });
-}
-
-Client.prototype.clearTimeline = function () {
-  console.log('clearing timeline');
-  this.funcPointers.forEach(function (funcPointer) {
-    var func = funcPointer.method === 'setInterval' ? clearInterval : clearTimeout;
-    func.call(global.window, funcPointer.pointer);
-  });
-  this.funcPointers = [];
 }
 
 Client.prototype.on = function (event, fn, options) {
@@ -51,12 +39,6 @@ Client.prototype.state = function (name, options, cb) {
 
   this.clearEventListeners();
 
-  if (this.currentState && this.currentState.timeline) {
-    this.clearTimeline();
-  }
-  if (this.currentState && this.currentState.teardown) {
-    this.currentState.teardown();
-  }
 
   if (name === null) {
     this.currentState = null;
@@ -74,7 +56,7 @@ Client.prototype.state = function (name, options, cb) {
 
     if (err) throw err;
 
-    var timelineFn, url;
+    var url;
 
     self.view(str);
 
@@ -87,19 +69,7 @@ Client.prototype.state = function (name, options, cb) {
 
     self.emit('stateChanged', self.currentState);
 
-    if (!nextState.timeline) {
-      timelineFn = function (callback) { callback(null, []); }; // noop if state has no timeline
-    } else if (typeof nextState.timeline !== 'function') {
-      timelineFn = function (callback) { callback(null, nextState.timeline); } // callback with timeline if provided as an object
-    } else {
-      timelineFn = nextState.timeline;
-    }
-
     timelineFn.call(nextState, function (err, timeline) {
-
-      if (timeline) {
-        self.timeline(timeline, nextState);
-      }
 
       if (cb) {
         // allow for 0 time timeline events to trigger before calling back
@@ -109,29 +79,6 @@ Client.prototype.state = function (name, options, cb) {
       }
 
     });
-  });
-}
-
-Client.prototype.timeline = function (timeline, context) {
-  if (typeof timeline === 'function') {
-    timeline = timeline();
-  }
-  console.log('creating timeline on ');
-  var self = this;
-  timeline.forEach(function (point) {
-    if (null === point.action || undefined === point.action) throw new Error('no action defined on timeline item. items must define actions to be applied on their corresponding context / view');
-    if (isNaN(point.time)) throw new Error('no time defined on timeline item. items must define a time at which to be applied on their corresponding context / view');
-    var setIntervalOrTimeout = point.repeat ? setInterval : setTimeout;
-    var method = point.repeat ? 'setInterval' : 'setTimeout';
-    var func = (function (){
-      var params = point.params;
-      return function () {
-        context[point.action].apply(context, params);
-      }
-    })();
-    var seconds = point.time * 1000;
-    var funcPointer = setIntervalOrTimeout.call(global.window, func, seconds);
-    self.funcPointers.push({ method: method, pointer: funcPointer });
   });
 }
 

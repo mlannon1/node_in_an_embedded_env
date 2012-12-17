@@ -21,27 +21,33 @@ domready(function () {
     }
   };
 
+  // below, shoe opens up a sock.js connection using the /dnode route
   var d = dnode(clientApi), stream = shoe('/dnode');
+
+  // here, we're calling server.wrap which will decorate our server object with the methods
+  // passed to us from the dnode server. We can then call any of those methods from any
+  // module on the client side.
   d.on('remote', function (srvr) {
-    // here, we're calling server.wrap which will decorate our server object with the methods
-    // passed to use from the dnode server. We can then call any of those methods from any
-    // module on the client side.
     server.wrap(srvr, function () {
       client.ready = true;
       client.emit('ready', srvr, client);
     });
   });
+
   d.on('end', function () {
     console.error('dnode end - client disconnected');
   });
+
   d.on('fail', function () {
     console.error('dnode fail - client disconnected');
   });
+
   d.on('error', function (err) {
     window.handleError(err);
     console.log('dnode error - client disconnected');
   });
 
+  // boilerplate dnode+shoe code required to create our client/server communication channel
   d.pipe(stream).pipe(d);
 
 });

@@ -37,4 +37,9 @@ var eventServer = new Server('/dnode');
 
 eventServer.use(serverApi.decorator(app));
 
+eventServer.listen(server, function (err, client) {
+  if (err) throw err;
+  console.log('client connected');
+});
+
 require('./lib/routes')(app);
