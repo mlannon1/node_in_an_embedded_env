@@ -1,0 +1,22 @@
+{
+  "name": "talking_to_people",
+  "version": "0.0.0",
+  "description": "ERROR: No README.md file found!",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "browserify": "*",
+    "domready": "*",
+    "dnode": "*",
+    "express" : "*",
+    "jade": "*",
+    "lodash": "*",
+    "shoe": "*",
+    "stylus": "*"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD"
+}
