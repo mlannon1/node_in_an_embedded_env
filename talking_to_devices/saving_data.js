@@ -7,11 +7,11 @@
  * proxySerialToFile function which actually saves our serial data.
  */
 
-var misc = require('misc'),
+var misc = require('misc'), //
     fs = require('fs'),
     serialPlayer = require('serialPlayer'),
     SerialPort = require('serialport'),
-    SerialParser = require('misc/lib/serial-parser');
+    SerialParser = require('misc/lib/serial-parser'); //
 
 var proxyfile = __dirname + '/' + process.env.RECORDING;
 var replayFile = (process.env.REPLAY) ? __dirname + '/../' + process.env.REPLAY : null;
@@ -64,5 +64,5 @@ module.exports.createDevice = function () {
     }()
   });
 
-  return new misc.Device(serialPort);
+  return new misc.Device(serialPort); // return our new device
 }
